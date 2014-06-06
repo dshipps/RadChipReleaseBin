@@ -1,6 +1,6 @@
 {
     "map_name": "Test 1",
-    "num_shaders": 13,
+    "num_shaders": 7,
     "shaders": [
         {
             "name": "basic_skybox",
@@ -36,39 +36,9 @@
             "name": "emitter",
             "vert": "Shaders/emitter.vert",
             "frag": "Shaders/emitter.frag"
-        },
-		{
-            "name": "ui_particle",
-            "vert": "Shaders/ui_particle.vert",
-            "frag": "Shaders/ui_particle.frag"
-        },
-		{
-            "name": "pe_system",
-            "vert": "Shaders/pe_system.vert",
-            "frag": "Shaders/pe_system.frag"
-        },
-		{
-            "name": "halo",
-            "vert": "Shaders/halo.vert",
-            "frag": "Shaders/halo.frag"
-        },
-		{
-            "name": "pe_torus",
-            "vert": "Shaders/pe_torus.vert",
-            "frag": "Shaders/pe_torus.frag"
-        },
-		{
-            "name": "pe_system_anim",
-            "vert": "Shaders/pe_system_anim.vert",
-            "frag": "Shaders/pe_system_anim.frag"
-        },
-		{
-            "name": "screen_texture",
-            "vert": "Shaders/screen_texture.vert",
-            "frag": "Shaders/screen_texture.frag"
         }
     ],
-    "num_audio": 47,
+    "num_audio": 6,
     "audio": [
         {
             "name": "Jump Wav",
@@ -93,170 +63,6 @@
         {
             "name": "Pre Punch",
             "path": "Sound/prepunch1.ogg"
-        },
-        {
-            "name": "menu hover",
-            "path": "Sound/menu_hover.wav"
-        },
-        {
-            "name": "menu click",
-            "path": "Sound/after_menu_press.wav"
-        },
-        {
-            "name": "Throw",
-            "path": "Sound/throw.mp3"
-        },
-        {
-            "name": "slap",
-            "path": "Sound/slap.mp3"
-        },
-        {
-            "name": "count",
-            "path": "Sound/Countdown.mp3"
-        },
-        {
-            "name": "Defeat",
-            "path": "Sound/Defeat.wav"
-        },
-        {
-            "name": "DoubleKillE",
-            "path": "Sound/DoubleKillE.wav"
-        },
-        {
-            "name": "DoubleKillY",
-            "path": "Sound/DoubleKillY.wav"
-        },
-        {
-            "name": "FirstBlood",
-            "path": "Sound/FirstBlood.wav"
-        },
-        {
-            "name": "KillingSpreeE",
-            "path": "Sound/KillingSpreeE.wav"
-        },
-        {
-            "name": "KillingSpreeY",
-            "path": "Sound/KillingSpreeY.wav"
-        },
-        {
-            "name": "KillTurretH",
-            "path": "Sound/KillTurretH.wav"
-        },
-        {
-            "name": "KillTurretH2",
-            "path": "Sound/KillTurretH2.wav"
-        },
-        {
-            "name": "Qfirstblood",
-            "path": "Sound/Qfirstblood.mp3"
-        },
-        {
-            "name": "Qkillingspree",
-            "path": "Sound/Qkillingspree.mp3"
-        },
-        {
-            "name": "Qrampage",
-            "path": "Sound/Qrampage.mp3"
-        },
-        {
-            "name": "Qunstoppable",
-            "path": "Sound/Qunstoppable.mp3"
-        },
-        {
-            "name": "TurretAlmostKillEne",
-            "path": "Sound/TurretAlmostKillEne.wav"
-        },
-        {
-            "name": "TurretAlmostKillYour",
-            "path": "Sound/TurretAlmostKillYour.wav"
-        },
-        {
-            "name": "TurretAttackedYourT",
-            "path": "Sound/TurretAttackedYourT.wav"
-        },
-        {
-            "name": "TurretDieYourTeam",
-            "path": "Sound/TurretDieYourTeam.wav"
-        },
-        {
-            "name": "TurretHalfKillEnemy",
-            "path": "Sound/TurretHalfKillEnemy.wav"
-        },
-        {
-            "name": "TurretHalfKillYourT",
-            "path": "Sound/TurretHalfKillYourT.wav"
-        },
-        {
-            "name": "Victory",
-            "path": "Sound/Victory.wav"
-        },
-        {
-            "name": "KillingSpree2E",
-            "path": "Sound/KillingSpree2E.wav"
-        },
-        {
-            "name": "KillingSpree3E",
-            "path": "Sound/KillingSpree3E.wav"
-        },
-        {
-            "name": "KillingSpree4E",
-            "path": "Sound/KillingSpree4E.wav"
-        },
-        {
-            "name": "KillingSpree5E",
-            "path": "Sound/KillingSpree5E.wav"
-        },
-        {
-            "name": "KillingSpree6E",
-            "path": "Sound/KillingSpree6E.wav"
-        },
-        {
-            "name": "KillingSpree2Y",
-            "path": "Sound/KillingSpree2Y.wav"
-        },
-        {
-            "name": "KillingSpree3Y",
-            "path": "Sound/KillingSpree3Y.wav"
-        },
-        {
-            "name": "KillingSpree4Y",
-            "path": "Sound/KillingSpree4Y.wav"
-        },
-        {
-            "name": "KillingSpree5Y",
-            "path": "Sound/KillingSpree5Y.wav"
-        },
-        {
-            "name": "KillingSpree6Y",
-            "path": "Sound/KillingSpree6Y.wav"
-        },
-        {
-            "name": "KillingSpreeU",
-            "path": "Sound/KillingSpreeU.wav"
-        },
-        {
-            "name": "KillingSpree2U",
-            "path": "Sound/KillingSpree2U.wav"
-        },
-        {
-            "name": "KillingSpree3U",
-            "path": "Sound/KillingSpree3U.wav"
-        },
-        {
-            "name": "KillingSpree4U",
-            "path": "Sound/KillingSpree4U.wav"
-        },
-        {
-            "name": "KillingSpree5U",
-            "path": "Sound/KillingSpree5U.wav"
-        },
-        {
-            "name": "KillingSpree6U",
-            "path": "Sound/KillingSpree6U.wav"
-        },
-        {
-            "name": "Shutdown",
-            "path": "Sound/Shutdown.wav"
         }
     ],
     "num_texture": 6,

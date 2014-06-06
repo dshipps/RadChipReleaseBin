@@ -2,6 +2,8 @@
                                                                                     
 layout (location=0) in vec3 VertexPosition;
 
+uniform mat4 ProjectionMatrix;
+uniform mat4 ViewMatrix;
 uniform mat4 ModelMatrix;
 //uniform mat4 MVP;         
 
@@ -11,8 +13,8 @@ out vec3 position;//position in world
 void main()                                                                         
 {                                                                                     
 	//gl_Position = MVP*vec4(VertexPosition,1.0);
-	gl_Position = ModelMatrix*vec4(VertexPosition,1.0);
+	gl_Position = vec4(VertexPosition,1.0);
 
-	//position = vec3(ModelMatrix*vec4(VertexPosition,1.0));
+	position = vec3(ModelMatrix*vec4(VertexPosition,1.0));
 	//cam = vec3(inverse(ViewMatrix)*vec4(0,0,0,1));
 }                                                                                    
