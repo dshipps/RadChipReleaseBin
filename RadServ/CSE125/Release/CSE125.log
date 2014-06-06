@@ -1,9 +1,54 @@
-﻿Build started 6/6/2014 8:43:49 AM.
-     1>Project "C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadServ\CSE125\CSE125.vcxproj" on node 2 (Build target(s)).
-     1>Link:
-         CSE125.vcxproj -> C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadServ\CSE125\Release\CSE125.exe
-     1>Done Building Project "C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadServ\CSE125\CSE125.vcxproj" (Build target(s)).
+﻿Build started 6/6/2014 1:52:52 PM.
+     1>Project "C:\YouMomIsFat\RadChipReleaseBin\RadServ\CSE125\CSE125.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Iinclude /Iinclude/Qt /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt billboard_list.cpp Boots.cpp ConfigSettings.cpp glslprogram.cpp glutils.cpp Helpers.cpp Item.cpp Mesh.cpp ogldev_util.cpp PlayerChar.cpp Projectile.cpp RangeWeapon.cpp ShaderController.cpp Texture.cpp VAO.cpp Weapon.cpp Window.cpp
+         billboard_list.cpp
+         Boots.cpp
+         ConfigSettings.cpp
+         glslprogram.cpp
+         glutils.cpp
+         Helpers.cpp
+     1>Helpers.cpp(14): warning C4244: 'initializing' : conversion from 'std::streamoff' to 'int', possible loss of data
+     1>Helpers.cpp(16): warning C4244: 'initializing' : conversion from 'std::streamoff' to 'int', possible loss of data
+         Item.cpp
+         Mesh.cpp
+         ogldev_util.cpp
+         PlayerChar.cpp
+         Projectile.cpp
+         RangeWeapon.cpp
+         ShaderController.cpp
+         Texture.cpp
+         VAO.cpp
+         Weapon.cpp
+         Window.cpp
+         Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
+         - add -D_WIN32_WINNT=0x0501 to the compiler command line; or
+         - add _WIN32_WINNT=0x0501 to your project's Preprocessor Definitions.
+         Assuming _WIN32_WINNT=0x0501 (i.e. Windows XP target).
+         GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\YouMomIsFat\RadChipReleaseBin\RadServ\CSE125\Release\CSE125.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:lib opengl32.lib glu32.lib glew32.lib QtCore4.lib QtOpenGL4.lib QtGui4.lib assimp.lib fmodex_vc.lib freeglut.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\YouMomIsFat\RadChipReleaseBin\RadServ\CSE125\Release\CSE125.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\YouMomIsFat\RadChipReleaseBin\RadServ\CSE125\Release\CSE125.lib" /MACHINE:X86 /SAFESEH Release\billboard_list.obj
+         Release\Boots.obj
+         Release\ConfigSettings.obj
+         Release\glslprogram.obj
+         Release\glutils.obj
+         Release\Helpers.obj
+         Release\Item.obj
+         Release\Mesh.obj
+         Release\ogldev_util.obj
+         Release\PlayerChar.obj
+         Release\Projectile.obj
+         Release\RangeWeapon.obj
+         Release\ShaderController.obj
+         Release\Texture.obj
+         Release\VAO.obj
+         Release\Weapon.obj
+         Release\Window.obj
+         Generating code
+         Finished generating code
+         CSE125.vcxproj -> C:\YouMomIsFat\RadChipReleaseBin\RadServ\CSE125\Release\CSE125.exe
+     1>Done Building Project "C:\YouMomIsFat\RadChipReleaseBin\RadServ\CSE125\CSE125.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.05
+Time Elapsed 00:00:14.70
