@@ -5,13 +5,13 @@ Item::Item(void)
 	health = 0;
 }
 
-Item::~Item(){
-
-}
-
 int Item::getHealth()
 {
 	return health;
+}
+
+Item::~Item(){
+
 }
 
 void Item::setHealth(int val)

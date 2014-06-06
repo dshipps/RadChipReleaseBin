@@ -1,0 +1,47 @@
+﻿Build started 6/6/2014 8:41:46 AM.
+     1>Project "C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadCli\CSE125\CSE125.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Iinclude/Qt /Iinclude /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt billboard_list.cpp ConfigSettings.cpp CXBOXController.cpp glslprogram.cpp glutils.cpp Helpers.cpp Mesh.cpp Mesh_Static.cpp ogldev_util.cpp ParseOpts.h Projectile.cpp ShaderController.cpp Texture.cpp VAO.cpp Window.cpp
+         billboard_list.cpp
+         ConfigSettings.cpp
+         CXBOXController.cpp
+         glslprogram.cpp
+         glutils.cpp
+         Helpers.cpp
+     1>Helpers.cpp(14): warning C4244: 'initializing' : conversion from 'std::streamoff' to 'int', possible loss of data
+     1>Helpers.cpp(16): warning C4244: 'initializing' : conversion from 'std::streamoff' to 'int', possible loss of data
+         Mesh.cpp
+         Mesh_Static.cpp
+         ogldev_util.cpp
+         ParseOpts.h
+         Projectile.cpp
+         ShaderController.cpp
+         Texture.cpp
+         VAO.cpp
+         Window.cpp
+         GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: perspective function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadCli\CSE125\Release\CSE125.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:lib opengl32.lib freeglut.lib glu32.lib glew32.lib QtCore4.lib QtOpenGL4.lib QtGui4.lib assimp.lib fmodex_vc.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadCli\CSE125\Release\CSE125.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadCli\CSE125\Release\CSE125.lib" /MACHINE:X86 /SAFESEH Release\billboard_list.obj
+         Release\ConfigSettings.obj
+         Release\CXBOXController.obj
+         Release\glslprogram.obj
+         Release\glutils.obj
+         Release\Helpers.obj
+         Release\Mesh.obj
+         Release\Mesh_Static.obj
+         Release\ogldev_util.obj
+         Release\ParseOpts.obj
+         Release\Projectile.obj
+         Release\ShaderController.obj
+         Release\Texture.obj
+         Release\VAO.obj
+         Release\Window.obj
+         Generating code
+         Finished generating code
+         CSE125.vcxproj -> C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadCli\CSE125\Release\CSE125.exe
+     1>Done Building Project "C:\Users\dshipps\Desktop\GitHub\RadChipReleaseBin\RadCli\CSE125\CSE125.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:21.49

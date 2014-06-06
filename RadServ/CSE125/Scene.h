@@ -182,6 +182,8 @@ public:
 		if (pUpCooldown[FARTHERSHOOT] > 0)
 			ret = ret | 1 << 4;
 
+		//cout << pUpCooldown[FASTERSHOOT] << " " << pUpCooldown[FARTHERSHOOT] << endl;
+
 		return ret;
 	}
 
@@ -227,25 +229,25 @@ public:
 			counter3 = -counter3;
 			counter2 = 0;
 		}
-		for (int i = 0; i < elevator.size(); ++i){
+		for (uint i = 0; i < elevator.size(); ++i){
 			if (elevator[i]->getDirection() != 1){
 				if (elevator[i]->getDirection() == -1){
 					elevator[i]->preTrans(glm::translate(vec3(0, 0, -counter3)));
 					vector<Object*> elplayers = elevator[i]->getPlayers();
-					for (int j = 0; j < elplayers.size(); ++j)
+					for (uint j = 0; j < elplayers.size(); ++j)
 						elplayers[j]->preTrans(glm::translate(vec3(0, 0, -counter3)));
 				}
 				else {
 					elevator[i]->preTrans(glm::translate(vec3(0, 0, counter3)));
 					vector<Object*> elplayers = elevator[i]->getPlayers();
-					for (int j = 0; j < elplayers.size(); ++j)
+					for (uint j = 0; j < elplayers.size(); ++j)
 						elplayers[j]->preTrans(glm::translate(vec3(0, 0, counter3)));
 				}
 			}
 			else {
 				elevator[i]->preTrans(glm::translate(vec3(0, counter3, 0)));
 				vector<Object*> elplayers = elevator[i]->getPlayers();
-				for (int j = 0; j < elplayers.size(); ++j)
+				for (uint j = 0; j < elplayers.size(); ++j)
 					elplayers[j]->preTrans(glm::translate(vec3(0, counter3, 0)));
 				/*
 				ofstream ofile;
@@ -392,14 +394,14 @@ public:
 		bool inX, inY, inZ;
 		AABB playerAABB;
 		vec3 powerUpPos;
-		for (int i = 0; i < player.size(); i++)
+		for (uint i = 0; i < player.size(); i++)
 		{
 			playerAABB = player[i]->getAABB();
 			//iterate through list of power up types
-			for (int j = 0; j < powerUps.size(); j++)
+			for (uint j = 0; j < powerUps.size(); j++)
 			{
 				//iterate through all billboard positions for a given powerup, in case there are multiple copies of a type
-				for (int l = 0; l < (powerUps[j]->getPos())->size(); l++)
+				for (uint l = 0; l < (powerUps[j]->getPos())->size(); l++)
 				{
 					powerUpPos = (*powerUps[j]->getPos())[l];
 					inX = (playerAABB.min[0] <= powerUpPos[0] + 2) && (powerUpPos[0] - 2 <= playerAABB.max[0]);
@@ -563,7 +565,7 @@ public:
 	{
 		int team0 = 0;
 		int team1 = 0;
-		for (int i = 0; i < tower.size(); i++)
+		for (uint i = 0; i < tower.size(); i++)
 		{
 			if (tower[i]->getHealth() < 1)
 			{
@@ -676,7 +678,7 @@ public:
 			player[i]->addVelocity(gravity*extra_speed);
 			player[i]->postTrans(glm::translate(player[i]->getVelocity()*t));
 		}
-	}
+	} 
 	void resolveTowerTransition(float t){
 		float extra_speed = t*GRAVITY_SCALE;
 		for (uint i = 0; i < tower.size(); i++){
@@ -759,7 +761,7 @@ public:
 		if (pUpCooldown[FARTHERSHOOT] > 0)
 			pUpCooldown[FARTHERSHOOT] -= 1;
 
-		for (int i = 0; i < player.size(); i++)
+		for (uint i = 0; i < player.size(); i++)
 		{
 			if (player[i]->getPowerUp() != 0)
 			{
@@ -801,8 +803,8 @@ public:
 					//Window::addPlayerList(holder);
 					//Window::respawnPlayer(holder->getName());
 					holder->putHealth(7);
-					holder->setModelM(holder->getAliveModelM()*glm::translate(vec3(0, 30, 0)));
-					holder->setVelocity(vec3(0, 20, 0));
+					holder->setModelM(holder->getAliveModelM());
+					//holder->setVelocity(vec3(0, 20, 0));
 					setPlayerDead(holder->getPlayerID(), false);
 					//cout << holder->getName() << " " << holder->getRespawn() << " " << holder->getHealth() << " " << player[i]->getHealth() << endl;
 
@@ -823,7 +825,7 @@ public:
 			}
 		}
 
-		for (int i = 0; i < stationary.size(); i++)
+		for (uint i = 0; i < stationary.size(); i++)
 		{
 			if (stationary[i]->getIsPlatformDamage())
 			{
@@ -987,6 +989,30 @@ public:
 			}
 		}
 
+		//stationary-tower projectile detection
+		for (uint i = 0; i < tower_projectile.size(); i++){
+			for (uint j = 0; j < stationary.size(); j++){
+				if (!stationary[j]->getIsPlatformDamage())
+					continue;
+				AABB pBox = tower_projectile[i]->getAABB();
+				AABB sBox = stationary[j]->getAABB();
+				bool collide = true;
+				for (int v = 0; v < 3; v++){
+					if (pBox.max[v] <= sBox.min[v] || sBox.max[v] <= pBox.min[v]){
+						collide = false;
+						break;
+					}
+				}
+				if (collide){
+					damageStationaryT(j, tower_projectile[i]->getPlayerID());
+					despon_tower_projectile_list.push_back(tower_projectile[i]->getShootID());
+					delete tower_projectile[i];
+					tower_projectile.erase(tower_projectile.begin() + i);
+					i--;
+					break;
+				}
+			}
+		}
 	}
 	void damagePlayer(int targetId, int playerId)
 	{
@@ -995,7 +1021,10 @@ public:
 		if (targetHolder->getTempHealth() <= 0)
 			targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
 		else
-			targetHolder->setTempHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		{
+			targetHolder->setHealth(targetHolder->getTempHealth() + ((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+
+		}
 		playerDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
@@ -1041,7 +1070,6 @@ public:
 			{
 				if (player[i]->getPlayerID() == targetId)
 				{
-					player[i]->setAliveModelM(player[i]->getModelM());
 					///////////////////////////////player[i]->setModelM(player[i]->getModelM()*glm::translate(vec3(0, 1000, 0)));
 				}
 			}
@@ -1049,24 +1077,36 @@ public:
 	}
 	void damageTower(int targetId, int playerId)
 	{
-		tower_damaged[targetId] = true;
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = getTowerObj(targetId);
-		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+
+		//if base tower id
+		if (targetId == 5)
+		{
+			//if side towers are dead
+			if (tower[0]->getHealth() < 1 && tower[1]->getHealth() < 1)
+			{
+				targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+				tower_damaged[targetId] = true;
+			}
+		}
+		else if (targetId == 4)
+		{
+			if (tower[2]->getHealth() < 1 && tower[3]->getHealth() < 1)
+			{
+				targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+				tower_damaged[targetId] = true;
+			}
+		}
+		else
+		{
+			targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+			tower_damaged[targetId] = true;
+		}
+
 		if (targetHolder->getHealth() < 1)
 		{
 			tower_kill[targetId] = true;
-			int dist, spd, dmg;
-			dist = ((RangeWeapon *)playerHolder->getWeapon())->getDistance() * 2;
-			spd = ((RangeWeapon *)playerHolder->getWeapon())->getSpeed() * 2;
-			dmg = ((RangeWeapon *)playerHolder->getWeapon())->getDamage() * 2;
-			//restricting speed and distance
-			if (dist > MAX_DISTANCE)
-				dist = MAX_DISTANCE;
-			if (spd > MAX_SPEED)
-				spd = MAX_SPEED;
-			if (dmg < MAX_DAMAGE)
-				dmg = MAX_DAMAGE;
 
 			targetHolder->setRespawn(RESPAWN_COUNTER);
 			//Window::removeDrawList((*targetHolder).getName());
@@ -1096,6 +1136,24 @@ public:
 		Object * playerHolder = getPlayerObj(playerId);
 		Object * targetHolder = stationary[targetId];
 		targetHolder->setHealth(((RangeWeapon *)playerHolder->getWeapon())->getDamage());
+		platformDamaged[targetId] = true;
+		if (targetHolder->getHealth() < 1)
+		{
+			platformDead[targetId] = true;
+			targetHolder->setRespawn(RESPAWN_COUNTER);
+			//Window::removeDrawList((*targetHolder).getName());
+			//Window::removePlayerList((*targetHolder).getName());
+			//respawn.push_back(targetHolder);
+			stationary[targetId]->setAliveModelM(stationary[targetId]->getModelM());
+			stationary[targetId]->setModelM(stationary[targetId]->getModelM()*glm::translate(vec3(1000, 1000, 1000)));
+		}
+	}
+
+	void damageStationaryT(int targetId, int playerId)
+	{
+		Object * playerHolder = tower[playerId];
+		Object * targetHolder = stationary[targetId];
+		targetHolder->setHealth(((Tower*)playerHolder)->getDamage());
 		platformDamaged[targetId] = true;
 		if (targetHolder->getHealth() < 1)
 		{
@@ -1200,7 +1258,7 @@ public:
 				int pid;
 				float min_dist=10000;
 				for (uint k = 0; k < player.size(); k++){
-					if (tower[i]->getTeamID() != player[k]->getTeamID()){
+					if (player[k]->getHealth()>0 && tower[i]->getTeamID() != player[k]->getTeamID()){
 						float dist = glm::distance(vec3(tower[i]->getModelM()*vec4(0, 0, 0, 1)), vec3(player[k]->getModelM()*vec4(0, 0, 0, 1)));
 						if (dist < tower[i]->getShootRange() && dist<min_dist){
 							pid = k;
@@ -1216,7 +1274,8 @@ public:
 					cubeT->setAABB(AABB(vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5)));
 					AABB hold = cubeT->getAABB();
 					cubeT->setStartX(hold.max[0]);
-					cubeT->setStartY(hold.max[2]);
+					cubeT->setStartY(hold.max[1]);
+					cubeT->setStartZ(hold.max[2]);
 					cubeT->setTeamID(tower[i]->getTeamID());
 					cubeT->setPlayerID(tower[i]->getPlayerID());
 
@@ -1246,7 +1305,7 @@ public:
 	}
 	void despawnProjectile()
 	{
-		//cout << projectile.size() << endl;
+		//cout << tower_projectile.size() << endl;
 		for (uint i = 0; i < projectile.size(); i++)
 		{
 			float startX = projectile[i]->getStartX();
@@ -1413,7 +1472,7 @@ public:
 		Cube* md51 = new Cube();
 		md51->setSpeed(PLAYER_SPEED);
 		md51->postTrans(glm::translate(vec3(0, 100, 92)));
-		md51->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
+		md51->postRotate(glm::rotate(mat4(1.0), 0.0f, vec3(0, 1, 0)));
 		md51->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md51->setType(MODEL);
 		md51->setName("Player Model1");
@@ -1437,7 +1496,7 @@ public:
 		Cube* md53 = new Cube();
 		md53->setSpeed(PLAYER_SPEED);
 		md53->postTrans(glm::translate(vec3(0, 100, 94)));
-		md53->postRotate(glm::rotate(mat4(1.0), 180.0f, vec3(0, 1, 0)));
+		md53->postRotate(glm::rotate(mat4(1.0), 0.0f, vec3(0, 1, 0)));
 		md53->setAABB(AABB(vec3(-0.25, 0.0, -0.25), vec3(0.25, 1.5, 0.25)));
 		md53->setType(MODEL);
 		md53->setName("Player Model3");
@@ -1446,7 +1505,7 @@ public:
 		md53->setAliveModelM(md53->getModelM());
 		addPlayer(md53);
 
-		for (int i = 0; i < player.size(); i++)
+		for (uint i = 0; i < player.size(); i++)
 		{
 			playerDamaged.push_back(false);
 			playerDead.push_back(false);
@@ -1454,13 +1513,13 @@ public:
 
 		//triplet tower
 		Tower* tw0 = new Tower();
-		tw0->postTrans(glm::translate(vec3(-70.0, 20.0, -100.0)));
+		tw0->postTrans(glm::translate(vec3(-68, 14.0, -80)));
 		tw0->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw0->setInterval(1.0);//shoot every 1 second if target exists
-		tw0->setShootRange(20);
-		tw0->setShootSpeed(20);
-		tw0->setHealth(20);
-		tw0->setDamage(-1);
+		tw0->setShootRange(40);
+		tw0->setShootSpeed(60);
+		tw0->putHealth(20);
+		tw0->setDamage(-3);
 		tw0->setType(MODEL);
 		tw0->setName("Tower Model0");
 		tw0->setTeamID(0);
@@ -1469,13 +1528,13 @@ public:
 
 		//triplet tower
 		Tower* tw1 = new Tower();
-		tw1->postTrans(glm::translate(vec3(70.0, 20.0, -100.0)));
+		tw1->postTrans(glm::translate(vec3(68, 14.0, -80)));
 		tw1->setAABB(AABB(vec3(-0.7, 0.75, -0.7), vec3(0.7, 3.75, 0.7)));
 		tw1->setInterval(1.0);//shoot every 1 second if target exists
-		tw1->setShootRange(20);
-		tw1->setShootSpeed(20);
-		tw1->setHealth(20);
-		tw1->setDamage(-1);
+		tw1->setShootRange(40);
+		tw1->setShootSpeed(60);
+		tw1->putHealth(20);
+		tw1->setDamage(-3);
 		tw1->setType(MODEL);
 		tw1->setName("Tower Model0");
 		tw1->setTeamID(0);
@@ -1484,13 +1543,13 @@ public:
 
 		//pctopus tower
 		Tower* tw2 = new Tower();
-		tw2->postTrans(glm::translate(vec3(70.0, 20, 100.0)));
+		tw2->postTrans(glm::translate(vec3(68, 14, 80)));
 		tw2->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw2->setInterval(1.0);//shoot every 1 second if target exists
-		tw2->setShootRange(20);
-		tw2->setShootSpeed(20);
-		tw2->setHealth(20);
-		tw2->setDamage(-1);
+		tw2->setShootRange(40);
+		tw2->setShootSpeed(60);
+		tw2->putHealth(20);
+		tw2->setDamage(-3);
 		tw2->setType(MODEL);
 		tw2->setName("Tower Model1");
 		tw2->setTeamID(1);
@@ -1499,13 +1558,13 @@ public:
 
 		//pctopus tower
 		Tower* tw3 = new Tower();
-		tw3->postTrans(glm::translate(vec3(-70.0, 20, 100.0)));
+		tw3->postTrans(glm::translate(vec3(-68, 14, 80)));
 		tw3->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tw3->setInterval(1.0);//shoot every 1 second if target exists
-		tw3->setShootRange(20);
-		tw3->setShootSpeed(20);
-		tw3->setHealth(20);
-		tw3->setDamage(-1);
+		tw3->setShootRange(40);
+		tw3->setShootSpeed(60);
+		tw3->putHealth(20);
+		tw3->setDamage(-3);
 		tw3->setType(MODEL);
 		tw3->setName("Tower Model1");
 		tw3->setTeamID(1);
@@ -1515,14 +1574,14 @@ public:
 		// TODO make this the boss tower
 		Tower* tower100 = new Tower();
 		tower100->postTrans(glm::translate(vec3(ORIGINX0,
-			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT + 2.9,
+			ORIGINY0 + CENTER_TOWERPLAT_HEIGHT - 0,
 			ORIGINZ0)));
 		tower100->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower100->setInterval(1.0);//shoot every 1 second if target exists
-		tower100->setShootRange(20);
-		tower100->setShootSpeed(20);
+		tower100->setShootRange(40);
+		tower100->setShootSpeed(60);
 		tower100->setHealth(20);
-		tower100->setDamage(-1);
+		tower100->setDamage(-3);
 		tower100->setType(MODEL);
 		tower100->setName("octo base");
 		tower100->setTeamID(1);
@@ -1534,14 +1593,14 @@ public:
 		// TODO make this the boss tower
 		Tower* tower200 = new Tower();
 		tower200->postTrans(glm::translate(vec3(ORIGINX1,
-			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT + 2.9,
+			ORIGINY1 + CENTER_TOWERPLAT_HEIGHT - 2,
 			ORIGINZ1)));
 		tower200->setAABB(AABB(vec3(-0.7, 0.6, -0.7), vec3(0.7, 4.79, 0.7)));
 		tower200->setInterval(1.0);//shoot every 1 second if target exists
-		tower200->setShootRange(20);
-		tower200->setShootSpeed(20);
+		tower200->setShootRange(40);
+		tower200->setShootSpeed(60);
 		tower200->setHealth(20);
-		tower200->setDamage(-1);
+		tower200->setDamage(-3);
 		tower200->setType(MODEL);
 		tower200->setName("nut base");
 		tower200->setTeamID(0);
@@ -1573,56 +1632,44 @@ public:
 		platform_01->setType(ELEVATOR);
 		platform_01->setDirection(1);
 		platform_01->setName("Test Platform");
-		platform_01->setIsPlatformDamage(false);
 		addStationary(platform_01);
 		elevator.push_back(platform_01);
 
 		//island 
-		Cube* platform_02 = new Cube(0, 40, -0.5, 0.5, -20.0, 20.00);
+		Cube* platform_02 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 		//platform_01->setSpeed(5); 
-		platform_02->postTrans(glm::translate(vec3(20.0, 14.0,0)));
-		platform_02->setAABB(AABB(vec3(0, -0.5, -20.0), vec3(40, 0.5, 20.0)));
+		platform_02->postTrans(glm::translate(vec3(30, 14, 0)));
+		platform_02->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
 		platform_02->setType(CUBE);
 		platform_02->setName("Test Platform");
-		platform_02->setIsPlatformDamage(true);
 		addStationary(platform_02);
 
 		//island 
-		Cube* platform_03 = new Cube(-40, 0, -0.5, 0.5, -20.0, 20.0);
+		Cube* platform_03 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
 		//platform_01->setSpeed(5); 
-		platform_03->postTrans(glm::translate(vec3(-20.0, 14.0,0)));
-		platform_03->setAABB(AABB(vec3(-40, -0.5, -20.0), vec3(0, 0.5, 20.0)));
+		platform_03->postTrans(glm::translate(vec3(-30, 14, 0)));
+		platform_03->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
 		platform_03->setType(CUBE);
 		platform_03->setName("Test Platform");
-		platform_03->setIsPlatformDamage(true);
 		addStationary(platform_03);
 
 		//walkway 
 		Cube* platform_04 = new Cube(-10.0, 10.0, -0.5, 0.5, -10, 42);
 		//platform_01->setSpeed(5); 
-		platform_04->postTrans(glm::translate(vec3(0.0, 14.0,20.0)));
+		platform_04->postTrans(glm::translate(vec3(0.0, 14.0, 20.0)));
 		platform_04->setAABB(AABB(vec3(-10.0, -0.5, -10), vec3(10.0, 0.5, 42)));
 		platform_04->setType(CUBE);
 		platform_04->setName("Test Platform");
 		addStationary(platform_04);
 
 		//barricade on walkway 
-		Cube* platform_05 = new Cube(-5, 5, -5, 5, -.5, .5);
+		/*Cube* platform_05 = new Cube(-5, 5, -5, 5, -.5, .5);
 		//platform_01->setSpeed(5); 
 		platform_05->postTrans(glm::translate(vec3(0.0, 18.0, 40.0)));
 		platform_05->setAABB(AABB(vec3(-5.0, -5, -0.5), vec3(5.0, 5, .5)));
 		platform_05->setType(CUBE);
 		platform_05->setName("Test Platform");
-		addStationary(platform_05);
-
-		//tower island
-		Cube* platform_06 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
-		//platform_01->setSpeed(5); 
-		platform_06->postTrans(glm::translate(vec3(60.0, 14.0,100.0)));
-		platform_06->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
-		platform_06->setType(CUBE);
-		platform_06->setName("Test Platform");
-		addStationary(platform_06);
+		addStationary(platform_05);*/
 
 		//walkway 
 		Cube* platform_07 = new Cube(-10.0, 10.0, -0.5, 0.5, -42, 10);
@@ -1634,40 +1681,49 @@ public:
 		addStationary(platform_07);
 
 		//barricade on walkway 
-		Cube* platform_08 = new Cube(-5, 5, -5, 5, -.5, .5);
+		/*Cube* platform_08 = new Cube(-5, 5, -5, 5, -.5, .5);
 		//platform_01->setSpeed(5); 
 		platform_08->postTrans(glm::translate(vec3(0.0, 18.0, -40.0)));
 		platform_08->setAABB(AABB(vec3(-5.0, -5, -0.5), vec3(5.0, 5, 0.5)));
 		platform_08->setType(CUBE);
 		platform_08->setName("Test Platform");
-		addStationary(platform_08);
+		addStationary(platform_08);*/
 
 		//tower island
-		Cube* platform_09 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+		Cube* platform_09 = new Cube(-10, 10, -0.5, 0.5, -10, 10);
 		//platform_01->setSpeed(5); 
-		platform_09->postTrans(glm::translate(vec3(60.0, 14.0,-100.0)));
-		platform_09->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
+		platform_09->postTrans(glm::translate(vec3(60.0, 14.0, -80.0)));
+		platform_09->setAABB(AABB(vec3(-10, -0.5, -10), vec3(10, 0.5, 10)));
 		platform_09->setType(CUBE);
 		platform_09->setName("Test Platform");
 		addStationary(platform_09);
 
 		//tower island
-		Cube* platform_10 = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+		Cube* platform_10 = new Cube(-10, 10, -0.5, 0.5, -10, 10);
 		//platform_01->setSpeed(5); 
-		platform_10->postTrans(glm::translate(vec3(-60.0, 14.0,-100.0)));
-		platform_10->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
+		platform_10->postTrans(glm::translate(vec3(-60.0, 14.0, -80.0)));
+		platform_10->setAABB(AABB(vec3(-10, -0.5, -10), vec3(10, 0.5, 10)));
 		platform_10->setType(CUBE);
 		platform_10->setName("Test Platform");
 		addStationary(platform_10);
 
 		//tower island
-		Cube* platform_10b = new Cube(-20, 20, -0.5, 0.5, -20, 20);
+		Cube* platform_10b = new Cube(-10, 10, -0.5, 0.5, -10, 10);
 		//platform_01->setSpeed(5); 
-		platform_10b->postTrans(glm::translate(vec3(-60.0, 14.0, 100.0)));
-		platform_10b->setAABB(AABB(vec3(-20, -0.5, -20), vec3(20, 0.5, 20)));
+		platform_10b->postTrans(glm::translate(vec3(-60.0, 14.0, 80.0)));
+		platform_10b->setAABB(AABB(vec3(-10, -0.5, -10), vec3(10, 0.5, 10)));
 		platform_10b->setType(CUBE);
 		platform_10b->setName("Test Platform");
 		addStationary(platform_10b);
+
+		//tower island
+		Cube* platform_06 = new Cube(-10, 10, -0.5, 0.5, -10, 10);
+		//platform_01->setSpeed(5); 
+		platform_06->postTrans(glm::translate(vec3(60.0, 14.0, 80.0)));
+		platform_06->setAABB(AABB(vec3(-10, -0.5, -10), vec3(10, 0.5, 10)));
+		platform_06->setType(CUBE);
+		platform_06->setName("Test Platform");
+		addStationary(platform_06);
 
 		//2nd level
 		Cube* platform_11 = new Cube(-10, 10, -0.5, 0.5, -5, 5);
@@ -1706,47 +1762,47 @@ public:
 		addStationary(platform_14);
 
 
-		//Trampoline 
+		//base trampolines
 		Trampoline* tramp_01 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_01->postTrans(glm::translate(vec3(80, 5.0, 35)));
+		tramp_01->postTrans(glm::translate(vec3(20, 5.0, 45)));
 		tramp_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_01->setBoost(vec3(0, 60, 0));
 		tramp_01->setType(TRAMPOLINE);
 		tramp_01->setName("Test Trampoline");
 		addStationary(tramp_01);
 
-		//Trampoline 
+		//base tramp
 		Trampoline* tramp_02 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_02->postTrans(glm::translate(vec3(-80, 5.0, 35)));
+		tramp_02->postTrans(glm::translate(vec3(-20, 5.0, 45)));
 		tramp_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_02->setBoost(vec3(0, 60, 0));
 		tramp_02->setType(TRAMPOLINE);
 		tramp_02->setName("Test Trampoline");
 		addStationary(tramp_02);
 
-		//Trampoline 
+		//base tramp 
 		Trampoline* tramp_03 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_03->postTrans(glm::translate(vec3(80, 5.0, -35)));
+		tramp_03->postTrans(glm::translate(vec3(20, 5.0, -45)));
 		tramp_03->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_03->setBoost(vec3(0, 60, 0));
 		tramp_03->setType(TRAMPOLINE);
 		tramp_03->setName("Test Trampoline");
 		addStationary(tramp_03);
 
-		//Trampoline 
+		//base tramp
 		Trampoline* tramp_04 = new Trampoline();
 		//platform_01->setSpeed(5); 
-		tramp_04->postTrans(glm::translate(vec3(-80, 5.0, -35)));
+		tramp_04->postTrans(glm::translate(vec3(-20, 5.0, -45)));
 		tramp_04->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
 		tramp_04->setBoost(vec3(0, 60, 0));
 		tramp_04->setType(TRAMPOLINE);
 		tramp_04->setName("Test Trampoline");
 		addStationary(tramp_04);
 
-		//Trampoline 
+		/*//Trampoline 
 		Trampoline* tramp_05 = new Trampoline();
 		//platform_01->setSpeed(5); 
 		tramp_05->postTrans(glm::translate(vec3(-15, 6.0, 0)));
@@ -1764,16 +1820,16 @@ public:
 		tramp_06->setBoost(vec3(0, 30, 0));
 		tramp_06->setType(TRAMPOLINE);
 		tramp_06->setName("Test Trampoline");
-		addStationary(tramp_06);
+		addStationary(tramp_06);*/
 
 
 
 		//teleporter 
 		Teleporter* tele_01 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_01->postTrans(glm::translate(vec3(78, 14.0,122)));
+		tele_01->postTrans(glm::translate(vec3(80, 14.0, 80)));
 		tele_01->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_01->setEndpoint(glm::translate(vec3(-60, 19.0, 100)));
+		tele_01->setEndpoint(glm::translate(vec3(-65, 15, 85)));
 		tele_01->setType(TELEPORTER);
 		tele_01->setName("Test Teleporter");
 		addStationary(tele_01);
@@ -1781,9 +1837,9 @@ public:
 		//teleporter 
 		Teleporter* tele_02 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_02->postTrans(glm::translate(vec3(-78, 14.0,122)));
+		tele_02->postTrans(glm::translate(vec3(-80, 14.0, 80)));
 		tele_02->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_02->setEndpoint(glm::translate(vec3(60, 19.0, 100)));
+		tele_02->setEndpoint(glm::translate(vec3(65, 15, 85)));
 		tele_02->setType(TELEPORTER);
 		tele_02->setName("Test Teleporter");
 		addStationary(tele_02);
@@ -1791,9 +1847,9 @@ public:
 		//teleporter 
 		Teleporter* tele_03 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_03->postTrans(glm::translate(vec3(78, 14.0,-122)));
+		tele_03->postTrans(glm::translate(vec3(80, 14.0, -80)));
 		tele_03->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_03->setEndpoint(glm::translate(vec3(-60, 19.0, -100)));
+		tele_03->setEndpoint(glm::translate(vec3(-65, 15, -85)));
 		tele_03->setType(TELEPORTER);
 		tele_03->setName("Test Teleporter");
 		addStationary(tele_03);
@@ -1801,12 +1857,13 @@ public:
 		//teleporter 
 		Teleporter* tele_04 = new Teleporter();
 		//platform_01->setSpeed(5); 
-		tele_04->postTrans(glm::translate(vec3(-78, 14.0,-122)));
+		tele_04->postTrans(glm::translate(vec3(-80, 14.0, -80)));
 		tele_04->setAABB(AABB(vec3(-2.0, -0.5, -2.0), vec3(2.0, 0.5, 2.0)));
-		tele_04->setEndpoint(glm::translate(vec3(60, 19.0, -100)));
+		tele_04->setEndpoint(glm::translate(vec3(65, 15, -85)));
 		tele_04->setType(TELEPORTER);
 		tele_04->setName("Test Teleporter");
 		addStationary(tele_04);
+
 
 
 		Elevator* ele_01 = new Elevator();
@@ -1849,14 +1906,8 @@ public:
 		addStationary(ele_04);
 		elevator.push_back(ele_04);
 
-		for (int i = 0; i < stationary.size(); i++)
-		{
-			platformDamaged.push_back(false);
-			platformDead.push_back(false);
-		}
-
 		counter2 = 0;
-		counter3 = 0.05;
+		counter3 = 0.05f;
 		//m_pMesh2 = new Mesh();
 		//m_pMesh2->LoadMesh("Model/monky_04_27_smooth.dae");
 		//m_pMesh2->setShader(sdrCtl.getShader("basic_model"));
@@ -1881,13 +1932,14 @@ public:
 		//md6->setName("Player Model");
 
 		//Floor
-		Cube* platform_200 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -0.5, 0.5, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
+		Teleporter* platform_200 = new Teleporter();
 		//platform_01->setSpeed(5); 
 		platform_200->postTrans(glm::translate(vec3(ORIGINX0,
 			ORIGINY0 + 5,
 			ORIGINZ0)));
 		platform_200->setAABB(AABB(vec3(-PERIMETER_WALL_RADIUS, -0.5, -PERIMETER_WALL_RADIUS), vec3(PERIMETER_WALL_RADIUS, 0.5, PERIMETER_WALL_RADIUS)));
-		platform_200->setType(CUBE);
+		platform_200->setType(TELEPORTER);
+		platform_200->setEndpoint(glm::translate(vec3(0, 100, 12)));
 		platform_200->setName("Test Platform");
 		// don't draw for now so we can peek inside
 		//addStationary(platform_200);
@@ -1958,6 +2010,7 @@ public:
 		platform_206->setAABB(AABB(vec3(-5, -0.5, -5), vec3(5, 0.5, 5))); 
 		platform_206->setType(CUBE);
 		platform_206->setName("Test Platform");
+		platform_206->setIsPlatformDamage(true);
 		addStationary(platform_206);
 
 		//diag plat 1
@@ -1968,6 +2021,7 @@ public:
 			ORIGINZ0 - CENTER_PLAT_SPACING)));
 		platform_207->setAABB(AABB(vec3(-5, -0.5, -5), vec3(5, 0.5, 5))); 
 		platform_207->setType(CUBE);
+		platform_207->setIsPlatformDamage(true);
 		platform_207->setName("Test Platform");
 		addStationary(platform_207);
 
@@ -1980,6 +2034,7 @@ public:
 		platform_208->setAABB(AABB(vec3(-5, -0.5, -5), vec3(5, 0.5, 5))); 
 		platform_208->setType(CUBE);
 		platform_208->setName("Test Platform");
+		platform_208->setIsPlatformDamage(true);
 		addStationary(platform_208);
 
 		//diag plat 3
@@ -1990,49 +2045,50 @@ public:
 			ORIGINZ0 + CENTER_PLAT_SPACING)));
 		platform_209->setAABB(AABB(vec3(-5, -0.5, -5), vec3(5, 0.5, 5))); 
 		platform_209->setType(CUBE);
+		platform_209->setIsPlatformDamage(true);
 		platform_209->setName("Test Platform");
 		addStationary(platform_209);
 
 		//stairs0 top
-		Cube* platform_210 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+		Cube* platform_210 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 		//platform_01->setSpeed(5); 
 		platform_210->postTrans(glm::translate(vec3(ORIGINX0,
-			ORIGINY0 + 15,
-			ORIGINZ0 - 30)));
-		platform_210->setAABB(AABB(vec3(-20, -0.5, -3), vec3(20, 0.5, 3))); 
+			ORIGINY0 + 17.5,
+			ORIGINZ0 - 45)));
+		platform_210->setAABB(AABB(vec3(-20, -1.5, -5), vec3(20, 1.5, 5)));
 		platform_210->setType(CUBE);
 		platform_210->setName("Test Platform");
 		addStationary(platform_210);
 
 		//stairs1
-		Cube* platform_211 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+		Cube* platform_211 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 		//platform_01->setSpeed(5); 
 		platform_211->postTrans(glm::translate(vec3(ORIGINX0,
 			ORIGINY0 + 14,
-			ORIGINZ0 - 40)));
-		platform_211->setAABB(AABB(vec3(-20, -0.5, -3), vec3(20, 0.5, 3))); 
+			ORIGINZ0 - 55)));
+		platform_211->setAABB(AABB(vec3(-20, -1.5, -5), vec3(20, 1.5, 5)));
 		platform_211->setType(CUBE);
 		platform_211->setName("Test Platform");
 		addStationary(platform_211);
 
 		//stairs2
-		Cube* platform_212 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+		Cube* platform_212 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 		//platform_01->setSpeed(5); 
 		platform_212->postTrans(glm::translate(vec3(ORIGINX0,
-			ORIGINY0 + 11,
-			ORIGINZ0 - 50)));
-		platform_212->setAABB(AABB(vec3(-20, -0.5, -3), vec3(20, 0.5, 3))); 
+			ORIGINY0 + 10.5,
+			ORIGINZ0 - 65)));
+		platform_212->setAABB(AABB(vec3(-20, -1.5, -5), vec3(20, 1.5, 5)));
 		platform_212->setType(CUBE);
 		platform_212->setName("Test Platform");
 		addStationary(platform_212);
 
 		//stairs3
-		Cube* platform_213 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+		Cube* platform_213 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 		//platform_01->setSpeed(5); 
 		platform_213->postTrans(glm::translate(vec3(ORIGINX0,
-			ORIGINY0 + 8,
-			ORIGINZ0 - 60)));
-		platform_213->setAABB(AABB(vec3(-20, -0.5, -3), vec3(20, 0.5, 3)));
+			ORIGINY0 + 7,
+			ORIGINZ0 - 75)));
+		platform_213->setAABB(AABB(vec3(-20, -1.5, -5), vec3(20, 1.5, 5)));
 		platform_213->setType(CUBE);
 		platform_213->setName("Test Platform");
 		addStationary(platform_213);
@@ -2092,13 +2148,14 @@ public:
 
 
 		//Floor
-		Cube* platform_300 = new Cube(-PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS, -0.5, 0.5, -PERIMETER_WALL_RADIUS, PERIMETER_WALL_RADIUS);
+		Teleporter* platform_300 = new Teleporter();
 		//platform_01->setSpeed(5); 
 		platform_300->postTrans(glm::translate(vec3(ORIGINX1,
 			ORIGINY1 + 5,
 			ORIGINZ1)));
 		platform_300->setAABB(AABB(vec3(-PERIMETER_WALL_RADIUS, -0.5, -PERIMETER_WALL_RADIUS), vec3(PERIMETER_WALL_RADIUS, 0.5, PERIMETER_WALL_RADIUS)));
-		platform_300->setType(CUBE);
+		platform_300->setType(TELEPORTER);
+		platform_300->setEndpoint(glm::translate(vec3(0, 100, -12)));
 		platform_300->setName("Test Platform");
 		// don't draw for now so we can peek inside
 		//addStationary(platform_300);
@@ -2167,6 +2224,7 @@ public:
 			ORIGINZ1 + CENTER_PLAT_SPACING)));
 		platform_306->setAABB(AABB(vec3(-5, -0.5, -5), vec3(5, 0.5, 5)));
 		platform_306->setType(CUBE);
+		platform_306->setIsPlatformDamage(true);
 		platform_306->setName("Test Platform");
 		addStationary(platform_306);
 
@@ -2178,6 +2236,7 @@ public:
 			ORIGINZ1 - CENTER_PLAT_SPACING)));
 		platform_307->setAABB(AABB(vec3(-5, -0.5, -5), vec3(5, 0.5, 5)));
 		platform_307->setType(CUBE);
+		platform_307->setIsPlatformDamage(true);
 		platform_307->setName("Test Platform");
 		addStationary(platform_307);
 
@@ -2189,6 +2248,7 @@ public:
 			ORIGINZ1 - CENTER_PLAT_SPACING)));
 		platform_308->setAABB(AABB(vec3(-5, -0.5, -5), vec3(5, 0.5, 5)));
 		platform_308->setType(CUBE);
+		platform_308->setIsPlatformDamage(true);
 		platform_308->setName("Test Platform");
 		addStationary(platform_308);
 
@@ -2200,49 +2260,50 @@ public:
 			ORIGINZ1 + CENTER_PLAT_SPACING)));
 		platform_309->setAABB(AABB(vec3(-5, -0.5, -5), vec3(5, 0.5, 5)));
 		platform_309->setType(CUBE);
+		platform_309->setIsPlatformDamage(true);
 		platform_309->setName("Test Platform");
 		addStationary(platform_309);
 
 		//stairs0 top
-		Cube* platform_310 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+		Cube* platform_310 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 		//platform_01->setSpeed(5); 
 		platform_310->postTrans(glm::translate(vec3(ORIGINX1,
-			ORIGINY1 + 15,
-			ORIGINZ1 + 30)));
-		platform_310->setAABB(AABB(vec3(-20, -0.5, -3), vec3(20, 0.5, 3)));
+			ORIGINY1 + 17.5,
+			ORIGINZ1 + 45)));
+		platform_310->setAABB(AABB(vec3(-20, -1.5, -5), vec3(20, 1.5, 5)));
 		platform_310->setType(CUBE);
 		platform_310->setName("Test Platform");
 		addStationary(platform_310);
 
 		//stairs1
-		Cube* platform_311 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+		Cube* platform_311 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 		//platform_01->setSpeed(5); 
 		platform_311->postTrans(glm::translate(vec3(ORIGINX1,
 			ORIGINY1 + 14,
-			ORIGINZ1 + 40)));
-		platform_311->setAABB(AABB(vec3(-20, -0.5, -3), vec3(20, 0.5, 3)));
+			ORIGINZ1 + 55)));
+		platform_311->setAABB(AABB(vec3(-20, -1.5, -5), vec3(20, 1.5, 5)));
 		platform_311->setType(CUBE);
 		platform_311->setName("Test Platform");
 		addStationary(platform_311);
 
 		//stairs2
-		Cube* platform_312 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+		Cube* platform_312 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 		//platform_01->setSpeed(5); 
 		platform_312->postTrans(glm::translate(vec3(ORIGINX1,
-			ORIGINY1 + 11,
-			ORIGINZ1 + 50)));
-		platform_312->setAABB(AABB(vec3(-20, -0.5, -3), vec3(20, 0.5, 3)));
+			ORIGINY1 + 10.5,
+			ORIGINZ1 + 65)));
+		platform_312->setAABB(AABB(vec3(-20, -1.5, -5), vec3(20, 1.5, 5)));
 		platform_312->setType(CUBE);
 		platform_312->setName("Test Platform");
 		addStationary(platform_312);
 
 		//stairs3
-		Cube* platform_313 = new Cube(-20, 20, -0.5, 0.5, -3, 3);
+		Cube* platform_313 = new Cube(-20, 20, -1.5, 1.5, -5, 5);
 		//platform_01->setSpeed(5); 
 		platform_313->postTrans(glm::translate(vec3(ORIGINX1,
-			ORIGINY1 + 8,
-			ORIGINZ1 + 60)));
-		platform_313->setAABB(AABB(vec3(-20, -0.5, -3), vec3(20, 0.5, 3)));
+			ORIGINY1 + 7,
+			ORIGINZ1 + 75)));
+		platform_313->setAABB(AABB(vec3(-20, -1.5, -5), vec3(20, 1.5, 5)));
 		platform_313->setType(CUBE);
 		platform_313->setName("Test Platform");
 		addStationary(platform_313);
@@ -2300,8 +2361,19 @@ public:
 
 
 
-
-
+		for (uint i = 0; i < stationary.size(); i++)
+		{
+			platformDamaged.push_back(false);
+			platformDead.push_back(false);
+		}
+		//cout << stationary.size() << " " << platformDamaged.size() << " " << platformDead.size() << endl;
+		//int test = 0;
+		//for (int i = 0; i < stationary.size(); i++)
+		//{
+		//	if (stationary[i]->getIsPlatformDamage())
+		//		test++;
+		//}
+		//cout << test << endl;
 
 
 
@@ -2323,7 +2395,7 @@ public:
 		powerUps.push_back(shotSpdUp);
 
 		BillboardList * shotRngUp = new BillboardList();
-		shotRngUp->AddBoard(vec3(0.0f, 14.0f, 0.0f));//Shot Rng up
+		shotRngUp->AddBoard(vec3(0.0f, 10.0f, 0.0f));//Shot Rng up
 		powerUps.push_back(shotRngUp);
 
 

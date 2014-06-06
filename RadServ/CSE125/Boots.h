@@ -7,7 +7,6 @@ class Boots : public Item
 public:
 	Boots();
 	Boots(int ms, int ss, int j);
-	~Boots();
 	void setMoveSpeed(int spd);
 	int getMoveSpeed();
 	void setSprintSpeed(int spd);

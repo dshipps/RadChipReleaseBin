@@ -40,6 +40,7 @@
 #define PLAYER1				1
 #define PLAYER2				2
 #define PLAYER3				3
+#define NOT_A_PLAYER		4
 
 
 //indicies for platform status
@@ -52,6 +53,22 @@
 
 
 //tower 
+#define TOWER_MAX_HP		20
+
+#define TOWER_FULL_HP		0
+#define TOWER_90P_HP		1
+#define TOWER_HALF_HP		2
+#define TOWER_10P_HP		3
+#define TOWER_0_HP			4
+
+#define TEAM_C_LEFT_TOWER   0
+#define TEAM_C_RIGHT_TOWER  1
+#define TEAM_C_MID_TOWER    5
+
+#define TEAM_M_LEFT_TOWER   2
+#define TEAM_M_RIGHT_TOWER  3
+#define TEAM_M_MID_TOWER    4
+
 #define NUM_TOWERS			6
 #define TOWERSHOOTBIT		0
 #define TOWER_ID			1
@@ -89,7 +106,7 @@
 #define CENTER_PLAT_HEIGHT    10
 
 // sounds
-#define NumberOfSounds 30
+#define NumberOfSounds 47
 #define SoundJumpWav 0
 #define SoundJumpOgg 1
 #define SoundVegeta 2
@@ -120,4 +137,21 @@
 #define SoundTurretHalfKillEnemy 27
 #define SoundTurretHalfKillYourT 28
 #define SoundVictory 29
+#define SoundKillingSpree2E 30
+#define SoundKillingSpree3E 31
+#define SoundKillingSpree4E 32
+#define SoundKillingSpree5E 33
+#define SoundKillingSpree6E 34
+#define SoundKillingSpree2Y 35
+#define SoundKillingSpree3Y 36
+#define SoundKillingSpree4Y 37
+#define SoundKillingSpree5Y 38
+#define SoundKillingSpree6Y 39
+#define SoundKillingSpreeU 40
+#define SoundKillingSpree2U 41
+#define SoundKillingSpree3U 42
+#define SoundKillingSpree4U 43
+#define SoundKillingSpree5U 44
+#define SoundKillingSpree6U 45
+#define SoundShutdown 46
 
